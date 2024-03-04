@@ -1,0 +1,285 @@
+1. Muestra el primer valor
+Muestra el nombre y el precio del primer vino.
+
+Pista. value-of
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:template match="/">
+    <html>
+      <body>
+        <h1>Nombre del primer vino:</h1>
+        <p><xsl:value-of select="viños/viño[1]/nome"/></p>
+        <h1>Precio del primer vino:</h1>
+        <p><xsl:value-of select="viños/viño[1]/prezo"/>€</p>
+      </body>
+    </html>
+  </xsl:template>
+</xsl:stylesheet>
+
+2. Muestra todos los valores
+Muestra para todos los vinos el nombre y el precio.
+
+Pista. for-each
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:template match="/">
+    <html>
+      <body>
+        <h2>Nombre y Precio de los Vinos:</h2>
+        <table border="1">
+          <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+          </tr>
+          <xsl:for-each select="viños/viño">
+            <tr>
+              <td><xsl:value-of select="nome"/></td>
+              <td><xsl:value-of select="prezo"/>€</td>
+            </tr>
+          </xsl:for-each>
+        </table>
+      </body>
+    </html>
+  </xsl:template>
+</xsl:stylesheet>
+
+3. Ordena los valores.
+Ordena los vinos de más caro a más barato.
+
+Pista. sort
+
+
+a) ¿qué pasa si no ponemos el data type? 
+
+c) ¿cuál es el orden por defecto?
+
+c) ¿para qué sirve case-order?
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:template match="/">
+    <html>
+      <body>
+        <h2>Vinos Ordenados de Más Caro a Más Barato:</h2>
+        <table border="1">
+          <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+          </tr>
+          <xsl:for-each select="viños/viño">
+            <xsl:sort select="prezo" order="descending" data-type="number"/>
+            <tr>
+              <td><xsl:value-of select="nome"/></td>
+              <td><xsl:value-of select="prezo"/>€</td>
+            </tr>
+          </xsl:for-each>
+        </table>
+      </body>
+    </html>
+  </xsl:template>
+</xsl:stylesheet>
+
+a) Si no especificas el tipo de datos (data-type), XSLT asumirá el tipo de datos por defecto que es de tipo alfabético.
+
+b) El orden por defecto es ascendente (order="ascending").
+
+c) La instrucción case-order se utiliza para especificar el orden de las letras en las operaciones de ordenamiento. 
+Por ejemplo, upper-first ordenará las letras mayúsculas antes que las minúsculas, mientras que lower-first hará lo contrario.
+
+4. Filtra para los que cumplen una condición.
+Muestra los vinos más caros de 9 €.
+
+Pista. if
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:template match="/">
+    <html>
+      <body>
+        <h2>Vinos más Caros de 9€:</h2>
+        <table border="1">
+          <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+          </tr>
+          <xsl:for-each select="viños/viño">
+            <xsl:if test="prezo &gt;= 9">
+              <tr>
+                <td><xsl:value-of select="nome"/></td>
+                <td><xsl:value-of select="prezo"/>€</td>
+              </tr>
+            </xsl:if>
+          </xsl:for-each>
+        </table>
+      </body>
+    </html>
+  </xsl:template>
+</xsl:stylesheet>
+
+5. Filtra para múltiples condiciones.
+Muestra en verde los vinos más baratos de 10€; en rojo los más caros de 30€. El resto sin destacar.
+
+Pista. Choose
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:template match="/">
+    <html>
+      <head>
+        <style>
+          .barato { color: green; }
+          .caro { color: red; }
+        </style>
+      </head>
+      <body>
+        <h2>Vinos:</h2>
+        <table border="1">
+          <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+          </tr>
+          <xsl:for-each select="viños/viño">
+            <tr>
+              <xsl:choose>
+                <xsl:when test="prezo &lt;= 10">
+                  <xsl:attribute name="class">barato</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="prezo &gt;= 30">
+                  <xsl:attribute name="class">caro</xsl:attribute>
+                </xsl:when>
+              </xsl:choose>
+              <td><xsl:value-of select="nome"/></td>
+              <td><xsl:value-of select="prezo"/>€</td>
+            </tr>
+          </xsl:for-each>
+        </table>
+      </body>
+    </html>
+  </xsl:template>
+</xsl:stylesheet>
+
+6. Con plantillas
+Muestra los vinos así:
+
+Para ello selecciona un conjunto de nodos del documento de entrada e instruye al procesador para aplicar las plantillas indicadas. 
+Pista. apply-templates
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+
+  <!-- Plantilla para el elemento viño -->
+  <xsl:template match="viño">
+    <div style="border: 1px solid black; padding: 5px; margin-bottom: 10px;">
+      <h3>Nombre: <span style="color: red;"><xsl:value-of select="nome"/></span></h3>
+      <p>Tipo: <xsl:value-of select="tipo"/></p>
+      <p>Precio: <span style="color: green;"><xsl:value-of select="prezo"/>€</span></p>
+    </div>
+  </xsl:template>
+
+  <!-- Plantilla para el elemento raíz viños -->
+  <xsl:template match="viños">
+    <html>
+      <head>
+        <title>Vinos</title>
+      </head>
+      <body>
+        <h1>Listado de Vinos</h1>
+        <!-- Aplica las plantillas a cada viño -->
+        <xsl:apply-templates/>
+      </body>
+    </html>
+  </xsl:template>
+
+</xsl:stylesheet>
+
+CICLOS
+
+7. Diferentes transformaciones XML a HTML
+Con ciclos.xml, transforma para mostrarlo.
+
+7.1 Sin etiquetas
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:template match="/">
+    <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="*">
+    <xsl:value-of select="."/>
+  </xsl:template>
+</xsl:stylesheet>
+
+7.2 Con párrafos
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:template match="/">
+    <html>
+      <body>
+        <xsl:apply-templates select="ies/ciclos/ciclo"/>
+      </body>
+    </html>
+  </xsl:template>
+
+  <xsl:template match="ciclo">
+    <p>
+      <strong>Nombre:</strong> <xsl:value-of select="nombre"/><br/>
+      <strong>Grado:</strong> <xsl:value-of select="grado"/><br/>
+      <strong>Año de Decreto de Título:</strong> <xsl:value-of select="decretoTitulo/@año"/><br/>
+    </p>
+  </xsl:template>
+</xsl:stylesheet>
+
+7.3 Con lista
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:template match="/">
+    <html>
+      <body>
+        <ul>
+          <xsl:apply-templates select="ies/ciclos/ciclo"/>
+        </ul>
+      </body>
+    </html>
+  </xsl:template>
+
+  <xsl:template match="ciclo">
+    <li>
+      <strong>Nombre:</strong> <xsl:value-of select="nombre"/><br/>
+      <strong>Grado:</strong> <xsl:value-of select="grado"/><br/>
+      <strong>Año de Decreto de Título:</strong> <xsl:value-of select="decretoTitulo/@año"/><br/>
+    </li>
+  </xsl:template>
+</xsl:stylesheet>
+
+7.4 Con tabla
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:template match="/">
+    <html>
+      <body>
+        <table border="1">
+          <tr>
+            <th>Nombre</th>
+            <th>Grado</th>
+            <th>Año de Decreto de Título</th>
+          </tr>
+          <xsl:apply-templates select="ies/ciclos/ciclo"/>
+        </table>
+      </body>
+    </html>
+  </xsl:template>
+
+  <xsl:template match="ciclo">
+    <tr>
+      <td><xsl:value-of select="nombre"/></td>
+      <td><xsl:value-of select="grado"/></td>
+      <td><xsl:value-of select="decretoTitulo/@año"/></td>
+    </tr>
+  </xsl:template>
+</xsl:stylesheet>
